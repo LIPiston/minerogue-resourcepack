@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/wooden_sword",
+  "textures": {
+    "layer0": "minerogue:item/wooden_sword"
+  }
+}

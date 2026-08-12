@@ -1,0 +1,4 @@
+art/source/
+art/fixed/
+*.zip
+__pycache__/

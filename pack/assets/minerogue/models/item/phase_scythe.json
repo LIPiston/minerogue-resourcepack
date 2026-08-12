@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/iron_hoe",
+  "textures": {
+    "layer0": "minerogue:item/phase_scythe"
+  }
+}
