@@ -27,7 +27,6 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--parent", type=Path, default=Path(".."), help="minerogue repository root")
     parser.add_argument("--pack", type=Path, default=Path("pack"))
-    parser.add_argument("--pixel-fixer", type=Path, default=None)
     args = parser.parse_args()
 
     weapons = sorted((args.parent / "content" / "weapons").glob("*.yml"))
@@ -48,6 +47,7 @@ def main() -> None:
             "parent": f"minecraft:item/{material}",
             "textures": {"layer0": f"minerogue:item/{weapon_id}"},
         })
+
 
 if __name__ == "__main__":
     main()
