@@ -33,3 +33,18 @@ depend on the displayed texture.
 Pixel Art Fixer is an image-processing correction step. It does not generate
 new artwork by itself; source sprites must be supplied by the art-generation
 step first.
+
+## Build locally
+
+From this repository:
+
+```bash
+python -m pip install -r tools/requirements.txt
+python tools/build_pack.py \
+  --parent .. \
+  --pixel-fixer C:/Users/<user>/AppData/Local/Temp/pixel-art-fixer
+```
+
+The build script generates the source sprites, runs Pixel Art Fixer, forces the
+corrected output to exactly 32x32 with nearest-neighbor resampling, and checks
+that every YAML weapon has a texture.
