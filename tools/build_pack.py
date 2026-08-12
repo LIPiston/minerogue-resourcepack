@@ -17,7 +17,7 @@ def main() -> None:
     subprocess.run([sys.executable, "tools/generate_source_art.py"], check=True)
     subprocess.run([sys.executable, "tools/generate_pack.py", "--parent", str(args.parent), "--pack", "pack"], check=True)
 
-    source_dir = Path("art/source")
+    source_dir = Path("art/generated")
     fixed_dir = Path("art/fixed")
     texture_dir = Path("pack/assets/minerogue/textures/item")
     fixed_dir.mkdir(parents=True, exist_ok=True)
@@ -29,7 +29,9 @@ def main() -> None:
             sys.executable, "-m", "pixelfixer.cli", str(source.resolve()), "--extract", str(fixed.resolve())
         ], cwd=args.pixel_fixer / "python", check=True)
         with Image.open(fixed) as image:
-            image.convert("RGBA").resize((32, 32), Image.Resampling.NEAREST).save(texture_dir / source.name)
+            image.convert("RGBA").resize((32, 32), Image.Resampling.NEAREST).save(fixed)
+
+        fixed.replace(texture_dir / source.name)
 
     missing = []
     for model in Path("pack/assets/minerogue/models/item").glob("*.json"):

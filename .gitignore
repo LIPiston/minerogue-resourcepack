@@ -1,4 +1,9 @@
 art/source/
+art/generated/
 art/fixed/
+.env
+tests/fixture.env
+*.key
+*.token
 *.zip
 __pycache__/

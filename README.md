@@ -48,3 +48,31 @@ python tools/build_pack.py \
 The build script generates the source sprites, runs Pixel Art Fixer, forces the
 corrected output to exactly 32x32 with nearest-neighbor resampling, and checks
 that every YAML weapon has a texture.
+
+## AI artwork generation
+
+The root-level `generate_ai.py` script calls an OpenAI-compatible image API.
+The API URL and key are loaded from `.env`; `.env` is ignored by Git and must
+never be committed. Start with:
+
+```bash
+copy .env.example .env
+python -m pip install Pillow
+python generate_ai.py --dry-run crimson_oath
+python generate_ai.py crimson_oath
+```
+
+The generated source images are written to `art/generated/`. To process them
+through Pixel Art Fixer and update the final 32x32 textures, use the separate
+build pipeline after adapting `tools/build_pack.py` to the selected source
+images. The script never prints or stores the API key.
+
+The current adapter expects a response shaped like:
+
+```json
+{"data": [{"b64_json": "..."}]}
+```
+
+or the equivalent `data[0].url` response. If the selected provider uses a
+different request or response schema, only `request_image()` needs adapting;
+the `.env` contract remains unchanged.

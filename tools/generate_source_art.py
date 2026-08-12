@@ -93,7 +93,9 @@ def draw_weapon(weapon_id: str, item: str) -> Image.Image:
         x = 5 + ((seed >> (i * 5)) % 22)
         y = 5 + ((seed >> (i * 3 + 2)) % 22)
         draw.point((x, y), fill=light)
-    return image
+    # Pixel Art Fixer reconstructs the native grid. Upscale the logical 32x32
+    # sprite first so the fixer returns a 32x32 texture instead of 8x8.
+    return image.resize((128, 128), Image.Resampling.NEAREST)
 
 
 def main() -> None:
