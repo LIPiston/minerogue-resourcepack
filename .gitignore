@@ -1,8 +1,8 @@
 art/source/
-art/generated/
 art/fixed/
 .env
 tests/fixture.env
+probe_api.py
 *.key
 *.token
 *.zip
