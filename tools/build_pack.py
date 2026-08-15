@@ -13,14 +13,17 @@ DEFAULT_OUTPUT_DIR = ROOT / "art" / "fixed"
 DEFAULT_PIXEL_FIXER = Path(__file__).resolve().parent / "pixel-art-fixer"
 
 
-def process_texture(source: Path, pixel_fixer: Path, output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
+def process_texture(source: Path, pixel_fixer: Path, output_dir: Path = DEFAULT_OUTPUT_DIR, name: str | None = None) -> Path:
     if source.suffix.lower() != ".png":
         raise ValueError("source image must be a PNG file")
     if not source.is_file():
         raise FileNotFoundError(f"source image not found: {source}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    fixed = output_dir / source.name
+    output_name = name or source.name
+    if not output_name.lower().endswith(".png"):
+        output_name += ".png"
+    fixed = output_dir / output_name
     subprocess.run([
         sys.executable, "-m", "pixelfixer.cli", str(source.resolve()), "--extract", str(fixed.resolve())
     ], cwd=pixel_fixer / "python", check=True)
