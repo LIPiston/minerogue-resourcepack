@@ -6,15 +6,15 @@ Minecraft Java resource pack for the `minerogue` Paper plugin.
 
 - 32x32 pixel-art weapon sprites.
 - One model namespace per YAML weapon ID.
-- Source artwork may be drawn manually or generated with an AI tool chosen by the artist.
-- [Retro-Diffusion/pixel-art-fixer](https://github.com/Retro-Diffusion/pixel-art-fixer) repairs the source artwork into Minecraft-ready pixel art.
+- 贴图全部由手工绘制，不使用 AI 生成。
 - The resource pack is included in the main plugin repository as a Git submodule.
 
 ## Resource-pack layout
 
 ```text
 art/
-└─ fixed/                         # Processed 32x32 RGBA PNG files; ignored by Git
+├─ source/                       # 手绘源图（PNG），不入库
+└─ fixed/                        # 处理后的 32x32 RGBA PNG，不入库
 pack/
 └─ assets/minerogue/
    ├─ items/<weapon-id>.json       # Item-model bindings
@@ -27,26 +27,21 @@ The plugin uses the vanilla item material from each weapon YAML and sets the
 weapon ID remains in the plugin's persistent data, so gameplay logic does not
 depend on the displayed texture.
 
-## Process one texture
+## 手工绘制流程
 
-Prepare a PNG yourself, either hand-drawn or generated through the image tool
-of your choice. Put Pixel Art Fixer in `tools/pixel-art-fixer/`, then drag the
-PNG onto `tools/fix_texture.bat`. The tool repairs the single image, converts
-it to 32x32 RGBA with nearest-neighbor resampling, and writes it to
-`art/fixed/<original-name>.png`.
+1. 手绘源图保存为 `art/source/<weapon-id>.png`（如 `art/source/crimson_oath.png`）。
+2. 用 `tools/fix_texture.bat` 将单张 PNG 修复为 32x32 RGBA，输出到 `art/fixed/<weapon-id>.png`。
+3. 审阅 `art/fixed/` 的结果，确认无误后手动复制到
+   `pack/assets/minerogue/textures/item/<weapon-id>.png`。
+4. 新增武器时运行 `tools/generate_pack.py`，根据插件 `content/weapons/*.yml`
+   生成对应的 items/models JSON。
 
-From a terminal, run the equivalent command:
+手工处理单张纹理：
 
 ```bash
 python -m pip install -r tools/requirements.txt
 python tools/build_pack.py <path-to-source.png>
 ```
-
-Use `--pixel-fixer <path>` only when Pixel Art Fixer is stored outside
-`tools/pixel-art-fixer/`.
-Review the result in `art/fixed/` before manually copying it to
-`pack/assets/minerogue/textures/item/<weapon-id>.png`. The tool never changes
-the resource pack's active textures.
 
 ## Validate and package
 
