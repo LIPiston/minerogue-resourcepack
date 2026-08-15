@@ -6,3 +6,4 @@ art/fixed/
 *.zip
 __pycache__/
 .pytest_cache/
+.mimosa/
