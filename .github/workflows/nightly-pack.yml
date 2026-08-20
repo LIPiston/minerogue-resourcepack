@@ -30,13 +30,29 @@ jobs:
           sha1sum minerogue-resourcepack.zip | awk '{print $1}' > minerogue-resourcepack.zip.sha1
           echo "sha1=$(cat minerogue-resourcepack.zip.sha1)" >> "$GITHUB_ENV"
 
+      - name: 取回旧 nightly 的 SHA1
+        id: previous
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download nightly --pattern 'minerogue-resourcepack.zip.sha1' --output previous.sha1 --clobber
+          echo "previous=$(cat previous.sha1)" >> "$GITHUB_ENV"
+
+      - name: 内容未变化则跳过重建
+        if: ${{ env.previous == env.sha1 }}
+        run: |
+          echo "材质包内容未变化（SHA1=${{ env.sha1 }}），保留现有 nightly release，不重建。"
+
       - name: 删除旧的 nightly 发布
+        if: ${{ env.previous != env.sha1 }}
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release delete nightly --yes --cleanup-tag
 
       - name: 创建新的 nightly 发布
+        if: ${{ env.previous != env.sha1 }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
