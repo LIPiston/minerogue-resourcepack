@@ -1,0 +1,53 @@
+name: 每夜材质包构建
+
+on:
+  schedule:
+    # UTC 18:00 = 北京时间 02:00，每夜自动构建
+    - cron: '0 18 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'pack/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 打包材质包
+        run: |
+          # 固定文件时间戳并去除额外属性，使内容不变时 zip 与 SHA1 可复现
+          find pack -exec touch -d '1980-01-01 00:00:00 UTC' {} +
+          cd pack
+          zip -r -X ../minerogue-resourcepack.zip .
+          cd ..
+          sha1sum minerogue-resourcepack.zip | awk '{print $1}' > minerogue-resourcepack.zip.sha1
+          echo "sha1=$(cat minerogue-resourcepack.zip.sha1)" >> "$GITHUB_ENV"
+
+      - name: 删除旧的 nightly 发布
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete nightly --yes --cleanup-tag
+
+      - name: 创建新的 nightly 发布
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create nightly \
+            --title "每夜构建材质包" \
+            --notes "每夜自动构建的 minerogue 材质包（pack_format 63，Minecraft 1.21.4+）。
+
+          SHA1: \`${{ env.sha1 }}\`
+
+          供插件 \`config.yml\` 的 \`resource-pack\` 使用：
+          - \`url\`：\`https://github.com/LIPiston/minerogue-resourcepack/releases/download/nightly/minerogue-resourcepack.zip\`
+          - \`hash\`：\`${{ env.sha1 }}\`
+          " \
+            minerogue-resourcepack.zip minerogue-resourcepack.zip.sha1
